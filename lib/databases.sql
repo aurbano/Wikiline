@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS `events` (
 CREATE TABLE IF NOT EXISTS `parse` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `url` varchar(255) NOT NULL,
-  `parsed` int(11) DEFAULT NULL,
-  `last` timestamp NULL DEFAULT NULL,
+  `parsed` datetime NULL DEFAULT NULL,
+  `last` datetime NULL DEFAULT NULL,
   `added` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `url` (`url`)
