@@ -16,8 +16,6 @@ class Parser{
 		$this->parse();
 	}
 	
-	// Opens last non crawled link from the parse table, and parses all its links
-	// It then stores them in the db for the next crawl
 	/**
        * 
        * Opens last non parsed link from table parse, and looks for dates in it.
