@@ -45,14 +45,18 @@ class Crawler{
 		try{
 			$next = $db->queryUniqueObject('SELECT id, url FROM parse WHERE last IS NULL');
 			print_r($next);
-			if(!$next) die('No more links to parse');
-			$db->preparedQuery('UPDATE parse SET last = ? WHERE id = ? LIMIT 1',array($db->date(),$next->id));
+			if($next){
+				$url = $next->url;
+				$db->preparedQuery('UPDATE parse SET last = ? WHERE id = ? LIMIT 1',array($db->date(),$next->id));
+			}
 		}catch(Exception $e){
 			die($e->getMessage());	
 		}
 		
+		if(!$url) $url = 'Dickens';
+		
 		// Make sure the crawl url is properly formatted
-		$crawl = str_replace(' ','_',$next->url);
+		$crawl = str_replace(' ','_',$url);
 		$data = json_decode($this->wiki->request($crawl,'parse','links'),true);
 		
 		// Just for commodity
