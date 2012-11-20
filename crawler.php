@@ -52,8 +52,8 @@ class Crawler{
 		}
 		
 		// Make sure the crawl url is properly formatted
-		$crawl = str_replace(' ','_',$next->url);
-		$data = json_decode($this->wiki->request($crawl,'parse','links'),true);
+		$url = str_replace(' ','_',$next->url);
+		$data = json_decode($this->wiki->request($url,'parse','links'),true);
 		
 		// Just for commodity
 		$links = $data['parse']['links'];
