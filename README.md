@@ -3,10 +3,12 @@ Wikiline
 
 A global timeline created from Wikipedia
 
+<h3>Executing</h3>
+WikiLine requires MySQL, first create a new database called 'timeline'. Assign a new user called 'time' to it, with password 'hWwnZbAT6dME9vde' (For development)
+
+On the release server everything will run automatically from cron jobs, but on development you have to run the crawler and parser manually. To start it up you must manually insert a Wikipedia entry on the database (Only the article ID, for example _Thomas_edison_), then run _crawler.php_
+
 <h3>Workflow</h3>
-Let's try to work with some guidelines. Once we have something sort of working, we will commit new stuff to a new branch. So if you are improving the way the parser works, you might create a new branch "parser".
-Once you are sure it works, you will select "Pull request", and someone else will take a look at it, to ensure we don't put bugs into final version.
+All new work should be done on a new branch, once it works fine we send in a pull request. For automatic merges just go on, if the merge cannot be resolved automatically go in shell mode to fix the merge manually.
 
-After it's merged, it goes into master. Every so often we will update the online server with the changed files in the master branch.
-
-Everything that's in the master branch should be ready for upload and ideally bug-free
+All code in the master branch should be fully functional.
