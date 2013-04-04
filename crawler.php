@@ -20,7 +20,6 @@ class Crawler{
        * 
        * Constructor, it automatically starts crawling
        *
-       * @return DB
        */
 	public function Crawler(){
 		// Start the Wikipedia API
