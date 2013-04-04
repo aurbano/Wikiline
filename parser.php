@@ -72,7 +72,7 @@ class Parser{
 				$type = 0;
 				if(in_array(strtolower(trim($lines[$i-1])),$this->initial)) $type = 3;
 				elseif(in_array(strtolower(trim($lines[$i-1])),$this->final)) $type = 4;
-				$this->add($lines[$i-1],$this->format($res[1],$res[2],$res[3]),$type);
+				$this->add($lines[$i-1],$this->format($res[1],$res[2],$res[3]),$i,$type);
 				continue;
 			}
 			// Sentence divider
@@ -96,7 +96,7 @@ class Parser{
 					
 					$name = $ev[1];
 					echo __LINE__;
-					$this->add($ev[1],$this->format($res[$a+1],$month,$ev[3]),1);
+					$this->add($ev[1],$this->format($res[$a+1],$month,$ev[3]),$i,1);
 					
 					var_dump($ev);
 					
@@ -108,7 +108,7 @@ class Parser{
 							if(isset($ev[2]) && $ev[2]) $month = date('m',strtotime($ev[2]));
 							if(!isset($ev[3])) $ev[3] = 0;
 							echo __LINE__;
-							$this->add($name,$this->format($res[$a+3],$month,$ev[3]),2);
+							$this->add($name,$this->format($res[$a+3],$month,$ev[3]),$i,2);
 							//$a = $a+3;
 							var_dump($ev);
 						}else{
@@ -126,12 +126,12 @@ class Parser{
 					if($ev[3]) $month = date('m',strtotime($ev[3]));
 					
 					echo __LINE__;
-					$this->add($ev[1],$this->format($ev[4],$month,$ev[2]),1);
+					$this->add($ev[1],$this->format($ev[4],$month,$ev[2]),$i,1);
 					
 					$month = 0;
 					if($ev[6]) $month = date('m',strtotime($ev[6]));
 					echo __LINE__;
-					$this->add($ev[1],$this->format($ev[7],$month,$ev[5]),2);
+					$this->add($ev[1],$this->format($ev[7],$month,$ev[5]),$i,2);
 					var_dump($ev);
 					continue;
 				}
@@ -151,7 +151,7 @@ class Parser{
 					
 					echo __LINE__;
 					if(strlen(trim($ev[1]))<1 && isset($res[$a+1])) $ev[1] = $res[$a+1];
-					$this->add($ev[1],$this->format($year,$month,$day));
+					$this->add($ev[1],$this->format($year,$month,$day),$i);
 					
 					var_dump($ev);
 					continue;
@@ -172,7 +172,7 @@ class Parser{
 					
 					echo __LINE__;
 					if(strlen(trim($ev[1]))<1 && isset($res[$a+1])) $ev[1] = $res[$a+1];
-					$this->add($ev[1],$this->format($year,$month,$day));
+					$this->add($ev[1],$this->format($year,$month,$day),$i);
 					
 					var_dump($ev);
 					continue;
@@ -194,7 +194,8 @@ class Parser{
 	}
 	
 	/**
-	 * Adds an event to the internal list
+	 * Adds an event to the internal list. Context is the paragraph from where it was extracted
+	 * it should be used for human rectification of the dates and data associated.
 	 * Types:
 	 * 	0	->	Normal event	(Not in any of the categories below)
 	 * 	1	->	Start of event	(i.e. Start of a war)
@@ -202,7 +203,7 @@ class Parser{
 	 * 	3	->	Start of entity (birth)
 	 * 	4	->	End of entity	(death)
 	 */
-	function add($name, $date, $type=0){
+	function add($name, $date, $context, $type=0){
 		$name = trim($name);
 		// Invalid dates out:
 		if(strlen($date)<1 || strlen($name) <1){
@@ -223,6 +224,7 @@ class Parser{
 		$this->events[] = array(
 			'name' => $name,
 			'date' => $date,
+			'context' => $context,
 			'type' => $type
 		);
 	}
