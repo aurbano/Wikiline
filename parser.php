@@ -71,20 +71,41 @@ class Parser{
 				continue;
 			}
 			// Kind of divides sentences 
-			preg_match('@(?:\.|,|:|;)?([^.:;]+)(?:\.|,|:|;)?@',$lines[$i],$res);
+			preg_match_all('@(?:\.|,|:|;)?([^.,:;]+)(?:\.|,|:|;)?@',$lines[$i],$res);
+			
+			$res = $res[1];
 			
 			var_dump($res);
 			
-			for($a=1;$a<count($res);$a++){
-				echo '<span style="color:blue">['.$res[$a].']</span>';
+			for($a=0;$a<count($res);$a++){
+				echo '<br /><span style="color:blue">['.$res[$a].']</span>';
 				// New matches container
 				$ev = array();
 				// Text until from YYYY to YYYY (Should be run on sentences only)
-				preg_match('@(.+) from (january|february|march|april|may|june|july|augost|september|october|november|december)?( [0-9]{1,2})?(?:, )?([0-9]{2,4}) to (january|february|march|april|may|june|july|augost|september|october|november|december)?( [0-9]{1,2})?(?:, )?([0-9]{2,4})@',$res[$a],$ev);
+				preg_match('@(.+) from (january|february|march|april|may|june|july|augost|september|october|november|december)?( [0-9]{1,2})?(?:, )?([0-9]{2,4})(?:,)? to (january|february|march|april|may|june|july|augost|september|october|november|december)?( [0-9]{1,2})?(?:, )?([0-9]{2,4})@',$res[$a],$ev);
+				if(count($ev)>0){
+					$month = 0;
+					if($ev[3]) $month = date('m',strtotime($ev[3]));
+					echo '<br /><span style="color:green">['.$ev[0].']</span>';
+					
+					$this->add('Start: '.$ev[1],$this->format($ev[4],$ev[3],$ev[2]));
+					
+					$month = 0;
+					if($ev[6]) $month = date('m',strtotime($ev[6]));
+					
+					$this->add('End: '.$ev[1],$this->format($ev[7],$ev[6],$ev[5]));
+					var_dump($ev);
+					continue;
+				}
+				
+				preg_match('@(.+) in ([0-9]{2,4})@',$res[$a],$ev);
 				if(count($ev)>0){
 					echo '<br /><span style="color:green">['.$ev[0].']</span>';
-					$this->add('Start: '.$ev[1],$this->format($ev[4],$ev[3],$ev[2]));
+					
+					$this->add($ev[1],$this->format($ev[2]));
+					
 					var_dump($ev);
+					continue;
 				}
 				
 			}
@@ -95,9 +116,7 @@ class Parser{
 		
 		echo '<hr /><h3>Parsed data:</h3>';
 
-		for($i=0;$i<count($this->events);$i++){
-			echo '<strong>'.$this->events[$i]['name'].'</strong>: '.$this->events[$i]['date'].'<br />';
-		}
+		var_dump($this->events);
 		
 		echo '<hr />Exec time: '.$sess->execTime();
 		
@@ -108,7 +127,11 @@ class Parser{
 	 * Adds an event to the internal list
 	 */
 	function add($name, $date){
-		echo '<br /><span style="color:red">{Added '.$date.'}</span><br />';
+		// Remove he/she/it from start
+		$name = trim($name);
+		if(substr(strtolower($name),0,3) == 'he ' || substr(strtolower($name),0,3) == 'it') $name = substr($name, 3);
+		if(substr(strtolower($name),0,4) == 'she ') $name = substr($name, 4);
+		echo '<br /><span style="color:red">{Added: '.$name.' in '.$date.'}</span><br />';
 		$this->events[] = array(
 			'name' => $name,
 			'date' => $date
@@ -118,7 +141,7 @@ class Parser{
 	/**
 	 * Returns date parsed in MySQL format
 	 */
-	 function format($year, $month=1, $day=1, $hour=0, $minutes=0, $seconds=0){
+	 function format($year, $month=0, $day=0, $hour=0, $minutes=0, $seconds=0){
 	 	// Ensure trailing 0
 	 	$month = str_pad($month,2,'0',STR_PAD_LEFT);
 		$day = str_pad($day,2,'0',STR_PAD_LEFT);
