@@ -45,7 +45,7 @@ class Crawler{
 			$next = $db->queryUniqueObject('SELECT id, url FROM parse WHERE last IS NULL');
 			print_r($next);
 			if(!$next) die('No more links to parse');
-			$db->preparedQuery('UPDATE parse SET last = ? WHERE id = ? LIMIT 1',array($db->date(),$next->id));
+			$db->preparedQuery('UPDATE parse SET last = NOW() WHERE id = ? LIMIT 1',array($next->id));
 		}catch(Exception $e){
 			die($e->getMessage());	
 		}
@@ -60,7 +60,7 @@ class Crawler{
 		$total = count($links);
 		if($total < 1) die('No links :(');
 		// Iterate through elements, and store them
-		$stmt = $db->db->prepare('INSERT IGNORE INTO parse(url,added) VALUES(:url,:added)');
+		$stmt = $db->db->prepare('INSERT IGNORE INTO parse(url,added) VALUES(:url,NOW())');
 		for($i=0;$i<$total;$i++){
 			$insert = false;
 			// Skip wikipedia or category links
