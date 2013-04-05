@@ -39,6 +39,7 @@ class Session{
 	 * Returns execution time until now
 	 */
 	 public function execTime(){
+	 	return xdebug_time_index();
 	 	list($msec, $sec) = explode(' ', microtime());
 		return floor($sec / 1000) + $msec - $this->mtStart;
 	 }

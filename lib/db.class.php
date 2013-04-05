@@ -63,11 +63,13 @@ class DB{
       * @param string $table Table where the insert will be performed
 	  * @param array $data An associative array with column=>data format.
 	  * @param boolean $ignore False by default, if true it will use INSERT IGNORE
-	  * @return int
+	  * @return int Last inserted id
       */
 	function preparedInsert($table, $data, $ignore = false){
 		if(sizeof($data)<1) return false;
 		// Setup:
+		$fields = '';
+		$insert = array();
 		while(list($key, $value) = each($data)){
 			$fields .= ','.$key;
 			$insert[':'.$key] = $value;
