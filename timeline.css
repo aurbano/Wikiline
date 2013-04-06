@@ -1,0 +1,88 @@
+/* Timeline CSS */
+#timeline-viewport{
+	width:100%;
+	margin:0;
+	padding:0;
+	overflow:auto;
+	border:1px solid #ccc;
+}
+#timeline{
+	width:2000px;
+	height:500px;
+	position:relative;
+}
+hr.line{
+	border:2px solid #ccc;
+}
+#timeline hr{
+	position:absolute;
+	top:50%;
+	width:100%;
+	z-index:1;
+}
+#timeline .tick{
+	position:absolute;
+	font-size:13px;
+	color:#bbb;
+	top:50%;
+	z-index:2;
+	border-left:#CCCCCC solid 1px;
+	margin-top:-10px;
+	height:40px;
+}
+#timeline .tick > span{
+	position:absolute;
+	bottom:-40px;
+	left:-50px;
+	width:100px;
+	text-align:center;
+}
+#timeline .item{
+	width:21px;
+	height:21px;
+	border:1px solid #fff;
+	position:absolute;
+	top:50%;
+	margin-top:-2px;
+	z-index:3;
+}
+#timeline .item:hover{
+	width:25px;
+	height:25px;
+	margin-top:-4px;
+	margin-left:-2px;
+	border-width:2px;
+}
+.item .info{
+	position:absolute;
+	z-index:4;
+	top:-200px;
+	left:0;
+	height:200px;
+	border-top:1px solid #ccc;
+	border-left:1px solid #ccc;
+}
+.info .content{
+	background:#fafafa;
+	padding:5px 15px;
+	width:300px;
+	box-shadow:inset #ddd 0 0 10px;
+}
+
+.politics{ background:#eb0000; }
+.politics .info{ border-color:#eb0000; }
+
+.history{ background:yellow; }
+.history .info{ border-color:yellow; }
+
+.science{ background:green; }
+.science .info{ border-color:green; }
+
+.sports{ background:pink; }
+.sports .info{ border-color:pink; }
+
+.entertainment{ background:orange; }
+.entertainment .info{ border-color:orange; }
+
+.art{ background:brown; }
+.art .info{ border-color:brown; }
