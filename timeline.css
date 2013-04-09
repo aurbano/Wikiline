@@ -67,6 +67,11 @@ hr.line{
 	width:200px;
 }
 .down .content{ position:absolute; bottom: 0;}
+.content time{
+	display:block;
+	color:#aaa;
+	font-size:80%;
+}
 
 .politics{ background:#eb0000; }
 .politics .info{ border-color:#eb0000; }

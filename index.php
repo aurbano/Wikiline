@@ -13,7 +13,7 @@
 </header>
 <div id="timeline-viewport">
 	<div id="timeline">
-		<div class="item entertainment" style="left:100px;">
+		<!--<div class="item entertainment" style="left:100px;">
 			<div class="info up">
 				<div class="content">
 					<h3>A very important event</h3>
@@ -28,11 +28,17 @@
 					<article>Entity</article>
 				</div>
 			</div>
-		</div>
+		</div>-->
 		<hr class="line" />
-		<div class="tick" style="left:500px"><span>1900</span></div>
 	</div>
 </div>
 <footer>Wikiline - Global timeline</footer>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="js/timeline.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	Timeline.main();
+});
+</script>
 </body>
 </html>
