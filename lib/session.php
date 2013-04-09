@@ -15,13 +15,15 @@ date_default_timezone_set('America/New_York');
 
 class Session{
 	private $db;	// Database handler holder.
+	var $mtStart;
 	
 	public function Session(){
-		// Right now I don't think we need anything here	
+		// Time counter
+		list($msec, $sec) = explode(' ', microtime());
+		$this->mtStart    = floor($sec / 1000) + $msec;
 	}
 	
 	/**
-       * 
        * DB Connection
        *
        * @return DB
@@ -32,6 +34,15 @@ class Session{
 		// Working with a local database for now
 		return $this->db = new DB('timeline','localhost','time','hWwnZbAT6dME9vde');	
 	}
+	
+	/**
+	 * Returns execution time until now
+	 */
+	 public function execTime(){
+	 	return xdebug_time_index();
+	 	list($msec, $sec) = explode(' ', microtime());
+		return floor($sec / 1000) + $msec - $this->mtStart;
+	 }
 };
 
 // Create a new Session object

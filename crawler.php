@@ -20,7 +20,6 @@ class Crawler{
        * 
        * Constructor, it automatically starts crawling
        *
-       * @return DB
        */
 	public function Crawler(){
 		// Start the Wikipedia API
@@ -46,14 +45,14 @@ class Crawler{
 			$next = $db->queryUniqueObject('SELECT id, url FROM parse WHERE last IS NULL');
 			print_r($next);
 			if(!$next) die('No more links to parse');
-			$db->preparedQuery('UPDATE parse SET last = ? WHERE id = ? LIMIT 1',array($db->date(),$next->id));
+			$db->preparedQuery('UPDATE parse SET last = NOW() WHERE id = ? LIMIT 1',array($next->id));
 		}catch(Exception $e){
 			die($e->getMessage());	
 		}
 		
 		// Make sure the crawl url is properly formatted
-		$crawl = str_replace(' ','_',$next->url);
-		$data = json_decode($this->wiki->request($crawl,'parse','links'),true);
+		$url = str_replace(' ','_',$next->url);
+		$data = json_decode($this->wiki->request($url,'parse','links'),true);
 		
 		// Just for commodity
 		$links = $data['parse']['links'];
@@ -61,7 +60,7 @@ class Crawler{
 		$total = count($links);
 		if($total < 1) die('No links :(');
 		// Iterate through elements, and store them
-		$stmt = $db->db->prepare('INSERT IGNORE INTO parse(url,added) VALUES(:url,:added)');
+		$stmt = $db->db->prepare('INSERT IGNORE INTO parse(url,added) VALUES(:url,NOW())');
 		for($i=0;$i<$total;$i++){
 			$insert = false;
 			// Skip wikipedia or category links
