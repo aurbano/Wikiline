@@ -38,6 +38,7 @@ var Timeline = {
 	 */
 	main : function(){
 		Timeline.drawTicks();
+		Timeline.loadEvents();
 		Timeline.drawEvent('');
 	},
 	/**
@@ -96,9 +97,11 @@ var Timeline = {
 	 * Load events from the database 
 	 */
 	loadEvents : function(){
-		$.post("loadEvents.php", {  },
+		var day = '01',
+			month = '01';
+		$.post("loadEvents.php", { start : day+'/'+month+'/'+Timeline.interval.start, end : day+'/'+month+'/'+Timeline.interval.end  },
 		  function(data){
-		  		
+		  		console.log(data);
 		  }, "json");
 	}
 };
