@@ -14,10 +14,18 @@
 <div id="timeline-viewport">
 	<div id="timeline">
 		<div class="item entertainment" style="left:100px;">
-			<div class="info">
+			<div class="info up">
 				<div class="content">
 					<h3>A very important event</h3>
-					<article>Description, if any</article>
+					<article>Entity</article>
+				</div>
+			</div>
+		</div>
+		<div class="item politics" style="left:300px;">
+			<div class="info down">
+				<div class="content">
+					<h3>Event 2</h3>
+					<article>Entity</article>
 				</div>
 			</div>
 		</div>

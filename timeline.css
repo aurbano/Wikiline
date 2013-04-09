@@ -56,18 +56,17 @@ hr.line{
 .item .info{
 	position:absolute;
 	z-index:4;
-	top:-200px;
 	left:0;
-	height:200px;
-	border-top:1px solid #ccc;
+	height:100px;
 	border-left:1px solid #ccc;
 }
+.item .up{ top:-100px; }
+.item .down{ bottom:-100px; }
 .info .content{
-	background:#fafafa;
-	padding:5px 15px;
-	width:300px;
-	box-shadow:inset #ddd 0 0 10px;
+	padding:0 5px;
+	width:200px;
 }
+.down .content{ position:absolute; bottom: 0;}
 
 .politics{ background:#eb0000; }
 .politics .info{ border-color:#eb0000; }
