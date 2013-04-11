@@ -276,7 +276,10 @@ class DayParser{
 			$this->month++;
 			if($this->month > 12) die('DONE');
 		}
-		echo '<a href="dayParser.php">Next</a>: '.ucfirst(date("F", mktime(0, 0, 0, $this->month, 10))).'_'.$this->day;
+		echo 'Redirecting to: '.ucfirst(date("F", mktime(0, 0, 0, $this->month, 10))).'_'.$this->day;
+		echo '<script>
+			window.location = "dayParser.php";
+		</script>';
 		// Next iteration
 		$_SESSION['day'] = $this->day;
 		$_SESSION['month'] = $this->month;
