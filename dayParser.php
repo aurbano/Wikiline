@@ -9,10 +9,15 @@ include('lib/session.php');			// Session management
 include('lib/wikipedia.api.php');	// Load Wikipedia php API
 
 class DayParser{
+	// Wikipedia API
 	private $wiki;
+	// Placeholder for the extracted events
 	private $events;
-	private $entity;
-	private $lines;
+	// List of entities and their IDs
+	private $entities = array();
+	// Current date
+	private $day;
+	private $month;
 	
 	var	$initial = array('born','created');
 	var	$final = array('died','death','closed');
@@ -36,38 +41,32 @@ class DayParser{
 		// Create a DB connection
 		global $sess;
 		$db = $sess->db();
-		// Get the fist non parsed link
-		/*try{
-			// Get next id and url, and update the parsed date
-			$next = $db->queryUniqueObject('SELECT id, url FROM parse WHERE last IS NULL');
-			print_r($next);
-			if(!$next) die('No links to parse');
-			//$db->preparedQuery('UPDATE parse SET parsed = FROM_UNIXTIME(?) WHERE id = ? LIMIT 1',array(time(),$next->id));
-		}catch(Exception $e){
-			die($e->getMessage());	
-		}
-		$this->entity = $next->id;
-		// Make sure the crawl url is properly formatted
-		$url = str_replace(' ','_',$next->url);*/
 		
-		$this->entity = 1;
-		$this->month = 3;
-		$this->day = 4;
-		$url = 'March_4';
+		if(!isset($_SESSION['month'])) $_SESSION['month'] = 1;
+		if(!isset($_SESSION['day'])) $_SESSION['day'] = 1;
 		
-		/*//* ONLINE
+		$this->month = $_SESSION['month'];
+		$this->day = $_SESSION['day'];
+		
+		$url = ucfirst(date("F", mktime(0, 0, 0, $this->month, 10))).'_'.$this->day;
+		
+		echo '<h1>'.$url.'</h1>';
+		
+		//* ONLINE
 		// Pull article from Wikipedia
 		$data = json_decode($this->wiki->request($url,'parse','text'),true);
 		
 		$toParse = $data['parse']['text']['*'];
 		
-		$this->times['download'] = $sess->execTime();
-		
 		//*/
 		
 		/* OFFLINE */
-		$toParse = file_get_contents('data/march.txt');
+		//$toParse = file_get_contents('data/march.txt');
 		
+		// Time counter
+		$this->times['download'] = $sess->execTime();
+		
+		// Parser
 		$events = array();
 		preg_match_all('@\<li\>(.+)\</li\>@',$toParse,$events);
 		
@@ -145,7 +144,7 @@ class DayParser{
 			return false;
 		}
 		
-		$this->events[] = array(
+		$new = array(
 			'name' => $name,
 			'entity' => $entity,
 			'date' => $date,
@@ -154,7 +153,7 @@ class DayParser{
 			'tags' => $tags
 		);
 		
-		var_dump($this->events[]);
+		$this->events[] = $new;
 	}
 	
 	/**
@@ -163,7 +162,6 @@ class DayParser{
 	 */
 	 function format($year, $month=0, $day=0, $hour=0, $minutes=0, $seconds=0){
 	 	// Validate year
-	 	echo '<br /><span style="color:green">[Received: '."$year-$month-$day $hour:$minutes:$seconds".']</span>';
 	 	$year = preg_replace('@\D@', '', $year);
 		if($year > 3000) return false;
 		if($month<0) $month = 0;
@@ -175,6 +173,7 @@ class DayParser{
 		if($minutes>59) $month = 59;
 		if($seconds>59) $seconds = 59;
 	 	// Ensure trailing 0
+		$year = str_pad($year,4,'0',STR_PAD_LEFT);
 	 	$month = str_pad($month,2,'0',STR_PAD_LEFT);
 		$day = str_pad($day,2,'0',STR_PAD_LEFT);
 		$hour = str_pad($hour,2,'0',STR_PAD_LEFT);
@@ -193,50 +192,67 @@ class DayParser{
 	 	if($total<1) return false;
 		echo '<h2>Importing '.$total.' elements</h2>';
 		$db = $sess->db();
+		
 		// Prepare queries
 		$eventsQuery = $db->db->prepare("
 			INSERT INTO
-				events(entity, refers, type, date, title, context, lang)
+				events(entity, refers, type, date, title, lang)
 			VALUES
-				(:entity, :refers, :type, :date, :title, :context, :lang)"
+				(:entity, :refers, :type, :date, :title, :lang)"
 		);
-		// Counter
-		$inserted = 0;
+		$relationsQuery = $db->db->prepare("
+			INSERT INTO
+				relations(eventId, entityId)
+			VALUES
+				(:eventId, :entityId)"
+		);
+		
+		$inserted = 0; // Counter
 		$lastID = NULL;
 		$context = array(); // References to IDs in context table
+		
 		for($i=0;$i<$total;$i++){
 			$refer = NULL;
-			// If the event is the end of something, refer to it
-			if($this->events[$i]['type'] == 2 && $lastID > 0){
-				$refer = $lastID; // Refers to the last inserted ID. Start-End events should be always in a row.
-			}
-			// Check the context
-			if(!isset($context[$this->events[$i]['context']])){
-				// We need to add a new context entry
-				$context[$this->events[$i]['context']] = $this->addContext($this->lines[$this->events[$i]['context']]);
-			}
+			
+			// Check if event doesnt exist yet
+			$exists = $db->preparedQuery("SELECT id FROM events WHERE title LIKE '?' LIMIT 1",array($this->events[$i]['name']));
+			if($db->numRows($exists)>0) continue;
+			
 			// Begin importing the elements
 			$element = array(
-				':entity' => $this->entity,
+				':entity' => $this->entityID($this->events[$i]['entity']),
 				':refers' => $refer,
 				':type' => $this->events[$i]['type'],
 				':date' => $this->events[$i]['date'],
 				':title' => $this->events[$i]['name'],
-				':context' => $context[$this->events[$i]['context']],
 				':lang' => 'en'
 			);
 			try{
 				$eventsQuery->execute($element);
 				// Get last inserted ID
-				if($db->lastInsertedId()>0){
-					$lastID = $db->lastInsertedId();
+				$eventId = $db->lastInsertedId();
+				if($eventId>0){
 					$inserted++;
+					$lastID = $eventId;
+					// Add tags if any
+					$tags = count($this->events[$i]['tags']);
+					if($tags>0){
+						// Add the tags
+						for($a=0;$a<$tags;$a++){
+							$ent = $this->entityID($this->events[$i]['tags'][$a]);
+							$relation = array(
+								':eventId' => $eventId,
+								':entityId' => $ent
+							);
+							$relationsQuery->execute($relation);
+						}
+					}
 				}else{
 					$lastID = NULL;
 				}
 			}catch(Exception $e){
 				if($e->getCode()!=='23000'){
-					$log .= "\n\tError 1 [{$e->getCode()}]: {$e->getMessage()}";
+					echo  "\n\tError 1 [{$e->getCode()}]: {$e->getMessage()}";
 				}
 				echo $log;
 				die();
@@ -251,16 +267,42 @@ class DayParser{
 				Downloading:		{$this->times['process']}
 			  	Parsing:		{$this->times['download']}
 			  	Importing:		{$this->times['import']}</pre>";
+		// -------------------------------------------------------- //
+		// Generate next iteration date
+		$maxDays = array(31,29,31,30,31,30,31,31,30,31,30,31);
+		$this->day++;
+		if($this->day > $maxDays[$this->month - 1]){
+			$this->day = 1;
+			$this->month++;
+			if($this->month > 12) die('DONE');
+		}
+		echo '<a href="dayParser.php">Next</a>: '.ucfirst(date("F", mktime(0, 0, 0, $this->month, 10))).'_'.$this->day;
+		// Next iteration
+		$_SESSION['day'] = $this->day;
+		$_SESSION['month'] = $this->month;
 	}
-
+	
 	/**
-	 * Stores a context paragraph in the database
-	 * and returns it's id
+	 * Given an entity it returns its Wikiline ID
+	 * @param String $entity The entity url
 	 */
-	function addContext($text){
+	function entityID($entity){
+		$entity = strtolower($entity);
+		// Check local copy
+		if(in_array($entity,$this->entities)) return $this->entities[$entity];
+		
+		// Check DB
 		global $sess;
 		$db = $sess->db();
-		return $db->preparedInsert('context', array('text'=>$text));
+		$entityID = $db->queryUniqueValue('SELECT id FROM `entities` WHERE `name` LIKE \''.addslashes($entity).'\'');
+		if(!$entityID){
+			// Create new entity
+			$db->preparedInsert('entities',array('name'=>$entity));
+			$entityID = $db->lastInsertedId();
+		}
+		// Store in local cache
+		$this->entities[$entity] = $entityID;	
+		return $entityID;
 	}
 };
 // Same as crawl here

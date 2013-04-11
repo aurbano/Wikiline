@@ -3,7 +3,6 @@
    * WikipediaAPI
    * This should handle all interactions with Wikipedia
    * 
-   * 
    * @package    Wikiline
    * @author     Alejandro U. Alvarez <alejandro@urbanoalvarez.es>
    */
