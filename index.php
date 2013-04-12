@@ -27,7 +27,6 @@
 		<hr class="line" />
 	</div>
 </div>
-<footer>Wikiline - Global timeline</footer>
 <link rel="stylesheet" type="text/css" media="all" href="layout.css" />
 <link rel="stylesheet" type="text/css" media="all" href="timeline.css" />
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -35,6 +34,9 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	Timeline.main();
+	$(window).resize(function(){
+		Timeline.resize();
+	});
 });
 </script>
 </body>

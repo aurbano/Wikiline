@@ -28,7 +28,15 @@ include('lib/session.php');
 $db = $sess->db();
 
 // Select events between dates
-$events = $db->preparedQuery('SELECT id, entity, type, date, title FROM events WHERE YEAR(date) > ? AND YEAR(date) < ? LIMIT 50',array($start,$end));
+$events = $db->preparedQuery('
+		SELECT
+			events.id, entities.name AS entity, type, date, title
+		FROM
+			events
+				LEFT OUTER JOIN entities ON events.entity = entities.id
+		WHERE
+			YEAR(date) > ? AND YEAR(date) < ? LIMIT 50',
+	array($start,$end));
 
 if($db->numRows($events)<1){
 	die(json_encode(array('done'=>false,'msg'=>'No events in specified interval ('.$start.'-'.$end).')'));
@@ -43,7 +51,7 @@ while($d = $db->fetchNextObject($events)){
 	$date = new DateTime($d->date);
 	// Prepare each of the items
 	$elements['items'][$i]['id'] = $d->id;
-	$elements['items'][$i]['entity'] = $d->entity;
+	$elements['items'][$i]['entity'] = ucwords(str_replace('_',' ',$d->entity));
 	$elements['items'][$i]['type'] = $types[$d->type];
 	$elements['items'][$i]['title'] = $d->title;
 	// Return the date

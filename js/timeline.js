@@ -12,13 +12,17 @@ var Timeline = {
 		end : 2000
 	},
 	/**
+	 * Minimum offset between drawn events
+	 */
+	combine : 30,
+	/**
 	 * Events buffer 
 	 */
 	events : new Array(),
 	/**
 	 * Draw resolution 
 	 */
-	resolution : 20,
+	resolution : 10,
 	/**
 	 * Display ticks on timeline 
 	 */
@@ -37,10 +41,15 @@ var Timeline = {
 	 * Main function, should be called on document ready 
 	 */
 	main : function(){
+		Timeline.resize();
 		Timeline.drawTicks();
 		Timeline.loadEvents();
 	},
-	lastOrientation : 'down',
+	lastEvent : {
+		orientation : 'down',
+		offset : 0,
+		obj : null
+	},	
 	/**
 	 * Draws an event on the timeline 
 	 * @param Object An object with all event properties
@@ -52,10 +61,7 @@ var Timeline = {
 			console.log('Event '+evt.title+' out of bounds');
 			return;
 		}
-		// Switch orientation
-		orientation = 'up';
-		if(orientation == Timeline.lastOrientation) orientation = 'down';
-		Timeline.lastOrientation = orientation;
+
 		/*
 		 * Calculating the offset: First the date is converted to a decimal number
 		 * in years, where the decimals represent months, days... etc
@@ -64,13 +70,40 @@ var Timeline = {
 			max = Timeline.interval.end - Timeline.interval.start,
 			offset = year * $('#timeline').width() / max;
 		
-		console.log(evt);
-		console.log('Calculating offset: year = '+year+', max='+max+', offset='+offset);
+		// Decide whether create a new item or mix with previous
+		if(Timeline.lastEvent.obj !== null){
+			// Now check offset
+			if(offset - Timeline.lastEvent.offset < Timeline.combine){
+				// Combine events
+				Timeline.lastEvent.obj.append(Timeline.createEvent(evt));
+				return;
+			}
+		}
+		
+		// Switch orientation
+		var orientation = 'up';
+		if(orientation == Timeline.lastEvent.orientation) orientation = 'down';
+		
+		var height = 100 + Math.random()*400,
+			side = 'bottom:-';
+		if(orientation == 'up') side = 'top:-';
 		
 		// Now draw the element
-		$('#timeline').append('<div class="item '+evt.type+'" style="left:'+offset+'px;"><div class="info '+orientation+'"><div class="content"><h3>'+evt.title+'</h3><article>'+evt.entity+'<time>'+Timeline.dateToString(evt.date)+'</time></article></div></div></div>');
+		var obj = $('<div class="item '+evt.type+'" style="left:'+offset+'px;"><div class="info '+orientation+'" style="height:'+height+'px; '+side+height+'px"><div class="content">'+Timeline.createEvent(evt)+'</div></div></div>').appendTo('#timeline').find('.content');
+		
+		// Store data for next drawing
+		Timeline.lastEvent.offset = offset;
+		Timeline.lastEvent.orientation = orientation;
+		Timeline.lastEvent.obj = obj;
 		
 		return offset;
+	},
+	/**
+	 *
+	 */
+	createEvent : function(evt){
+		var id = evt.title.replace(' ','_');
+		return '<div class="event" id="'+id+'"><h3>'+evt.entity+'</h3><article>'+evt.title+'</article><time>'+Timeline.dateToString(evt.date)+'</time></div>';
 	},
 	/**
 	 * Converts a date object to a digit
@@ -112,5 +145,12 @@ var Timeline = {
 				//if(callback !== undefined) callback.call();
 			},
 		"json");
+	},
+	/**
+	 * Maintain viewport in full size
+	 */
+	resize : function(){
+		$('#timeline-viewport').width($(window).width());
+		$('#timeline-viewport').height($(window).height());
 	}
 };
