@@ -64,8 +64,8 @@ var Timeline = {
 	 */
 	createRows : function(){
 		// Should be called once everything has been resized
-		var height = Timeline.$('#events').height(),
-			numRows = Math.floor(height/Timeline.rowHeight) - 1;		
+		var height = Timeline.$('#events').height()-10,
+			numRows = Math.floor(height/Timeline.rowHeight);		
 		for(i=0;i<numRows;i++){
 			Timeline.rows[i] = 0;
 		}

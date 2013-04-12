@@ -15,7 +15,7 @@
 	left:0;
 	background:#EBEBEB;
 	border-top:#CCC solid 5px;
-	height:100px;
+	height:80px;
 }
 #timeline .tick{
 	position:absolute;
@@ -44,7 +44,7 @@
 	border-radius:10px;
 }
 .event:hover{
-	background:#EFEFEF;
+	z-index:9;
 }
 .event article{
 	display:none;
