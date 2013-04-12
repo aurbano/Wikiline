@@ -14,7 +14,7 @@ var Timeline = {
 	/**
 	 * Events buffer 
 	 */
-	events : {},
+	events : new Array(),
 	/**
 	 * Draw resolution 
 	 */
@@ -38,32 +38,24 @@ var Timeline = {
 	 */
 	main : function(){
 		Timeline.drawTicks();
-		Timeline.drawEvent('');
+		Timeline.loadEvents();
 	},
+	lastOrientation : 'down',
 	/**
 	 * Draws an event on the timeline 
 	 * @param Object An object with all event properties
 	 */
 	drawEvent : function(evt){
 		// Sample event
-		evt = {
-			title : 'Born',
-			entity : 'Thomas Edison',
-			type : 'politics',
-			date : {
-				year : 1847,
-				month : 02,
-				day : 11,
-				hour : 00,
-				minute : 00,
-				seconds : 00
-			}
-		};
 		// Test boundaries
-		if(evt.date.year < Timeline.interval.start || evt.date.year > Timeline.interval.end){
+		if(evt.date.y < Timeline.interval.start || evt.date.y > Timeline.interval.end){
 			console.log('Event '+evt.title+' out of bounds');
 			return;
 		}
+		// Switch orientation
+		orientation = 'up';
+		if(orientation == Timeline.lastOrientation) orientation = 'down';
+		Timeline.lastOrientation = orientation;
 		/*
 		 * Calculating the offset: First the date is converted to a decimal number
 		 * in years, where the decimals represent months, days... etc
@@ -72,8 +64,13 @@ var Timeline = {
 			max = Timeline.interval.end - Timeline.interval.start,
 			offset = year * $('#timeline').width() / max;
 		
+		console.log(evt);
+		console.log('Calculating offset: year = '+year+', max='+max+', offset='+offset);
+		
 		// Now draw the element
-		$('#timeline').append('<div class="item '+evt.type+'" style="left:'+offset+'px;"><div class="info up"><div class="content"><h3>'+evt.title+'</h3><article>'+evt.entity+'<time>'+Timeline.dateToString(evt.date)+'</time></article></div></div></div>');
+		$('#timeline').append('<div class="item '+evt.type+'" style="left:'+offset+'px;"><div class="info '+orientation+'"><div class="content"><h3>'+evt.title+'</h3><article>'+evt.entity+'<time>'+Timeline.dateToString(evt.date)+'</time></article></div></div></div>');
+		
+		return offset;
 	},
 	/**
 	 * Converts a date object to a digit
@@ -82,7 +79,7 @@ var Timeline = {
 	 */
 	dateToDigit : function(date){
 		// For now everything below minutes is trivial
-		return date.year + date.month/12 + date.day/372 + date.hour/8928;
+		return parseInt(date.y) + parseInt(date.m)/12 + parseInt(date.d)/372 + parseInt(date.h)/8928;
 	},
 	/**
 	 * Converts a date object to a string for representation
@@ -90,15 +87,30 @@ var Timeline = {
 	 * @return string Date in string format
 	 */
 	dateToString : function(date){
-		return date.day + '/' + date.month + '/' + date.year;
+		return date.d + '/' + date.m + '/' + date.y;
 	},
 	/**
 	 * Load events from the database 
 	 */
 	loadEvents : function(){
-		$.post("loadEvents.php", {  },
-		  function(data){
-		  		
-		  }, "json");
+		$.post("loadEvents.php", { start : Timeline.interval.start, end : Timeline.interval.end  },
+			function(data){
+				console.log(data)
+				if(data.msg.length > 0) alert(data.msg);
+				
+				if(!data.done) return;
+				
+				if(data.done == true){
+					var distance = 0;
+					$.each(data.items, function(i, val) {
+						// Store event
+						Timeline.events.push(val);
+						// Draw
+						Timeline.drawEvent(val);
+					});
+				}
+				//if(callback !== undefined) callback.call();
+			},
+		"json");
 	}
 };
