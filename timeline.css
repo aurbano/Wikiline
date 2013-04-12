@@ -4,31 +4,30 @@
 	height:100%;
 	margin:0;
 	padding:0;
-	overflow:auto;
+	overflow:hidden;
 	border:1px solid #ccc;
 }
-#timeline{
+#events{
 	width:2000px;
 	height:100%;
 	position:relative;
 }
-hr.line{
-	border:2px solid #ccc;
-}
-#timeline hr{
+#timeline{
 	position:absolute;
-	top:50%;
-	width:100%;
-	z-index:2;
+	bottom:0;
+	left:0;
+	width:2000px;
+	background:#EBEBEB;
+	border-top:#CCC solid 5px;
+	height:100px;
 }
 #timeline .tick{
 	position:absolute;
 	font-size:13px;
 	color:#666;
-	top:50%;
+	top:0;
 	z-index:2;
 	border-left:#CCCCCC solid 1px;
-	margin-top:-10px;
 	height:40px;
 }
 #timeline .tick > span{
@@ -38,21 +37,16 @@ hr.line{
 	width:100px;
 	text-align:center;
 }
-#timeline .item{
+.item{
 	width:21px;
 	height:21px;
 	border:1px solid #fff;
 	position:absolute;
-	top:50%;
-	margin-top:-2px;
+	bottom:-12px;
 	z-index:3;
 }
-#timeline .item:hover{
-	width:25px;
-	height:25px;
-	margin-top:-4px;
-	margin-left:-2px;
-	border-width:2px;
+.item:hover{
+	z-index:9;
 }
 .item .info{
 	position:absolute;
@@ -60,14 +54,14 @@ hr.line{
 	left:0;
 	height:100px;
 	border-left:1px solid #ccc;
+	top:-100px;
 }
-.item .up{ top:-100px; }
-.item .down{ bottom:-100px; }
 .info .content{
 	padding:0 5px;
 	width:200px;
 	background:#FFF;
 	overflow:auto;
+	max-height:400px;
 }
 .content h3{
 	max-height:100px;

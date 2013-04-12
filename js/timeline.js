@@ -46,7 +46,6 @@ var Timeline = {
 		Timeline.loadEvents();
 	},
 	lastEvent : {
-		orientation : 'down',
 		offset : 0,
 		obj : null
 	},	
@@ -69,7 +68,7 @@ var Timeline = {
 		 */
 		var year = Timeline.dateToDigit(evt.date) - Timeline.interval.start,
 			max = Timeline.interval.end - Timeline.interval.start,
-			offset = year * $('#timeline').width() / max;
+			offset = year * $('#events').width() / max;
 		
 		// Decide whether create a new item or mix with previous
 		if(Timeline.lastEvent.obj !== null){
@@ -82,20 +81,13 @@ var Timeline = {
 			}
 		}
 		
-		// Switch orientation
-		var orientation = 'up';
-		if(orientation == Timeline.lastEvent.orientation) orientation = 'down';
-		
-		var height = 300 + Math.random()*100,
-			side = 'bottom:-';
-		if(orientation == 'up') side = 'top:-';
+		var height = 500 + Math.random()*300;
 		
 		// Now draw the element
-		var obj = $('<div class="item '+evt.type+'" style="left:'+offset+'px;"><div class="info '+orientation+'" style="height:'+height+'px; '+side+height+'px"><div class="content">'+Timeline.createEvent(evt)+'</div></div></div>').appendTo('#timeline').find('.content');
+		var obj = $('<div class="item '+evt.type+'" style="left:'+offset+'px;"><div class="info up" style="height:'+height+'px; top:-'+height+'px"><div class="content">'+Timeline.createEvent(evt)+'</div></div></div>').appendTo('#events').find('.content');
 		
 		// Store data for next drawing
 		Timeline.lastEvent.offset = offset;
-		Timeline.lastEvent.orientation = orientation;
 		Timeline.lastEvent.obj = obj;
 		
 		return offset;
@@ -154,5 +146,7 @@ var Timeline = {
 	resize : function(){
 		$('#timeline-viewport').width($(window).width());
 		$('#timeline-viewport').height($(window).height());
+		
+		$('#events').height($(window).height() - $('#timeline').height() - 5);
 	}
 };
