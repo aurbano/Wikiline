@@ -30,12 +30,16 @@ $db = $sess->db();
 // Select events between dates
 $events = $db->preparedQuery('
 		SELECT
-			events.id, entities.name AS entity, type, date, title
+			events.id, entities.name AS entity, type, date, title, YEAR(date) AS year
 		FROM
 			events
 				LEFT OUTER JOIN entities ON events.entity = entities.id
 		WHERE
-			YEAR(date) > ? AND YEAR(date) < ? LIMIT 50',
+			YEAR(date) > ? AND YEAR(date) < ?
+			AND type = 0
+		GROUP BY year
+		ORDER BY date ASC
+		LIMIT 200',
 	array($start,$end));
 
 if($db->numRows($events)<1){
@@ -49,11 +53,18 @@ $i=0;
 while($d = $db->fetchNextObject($events)){
 	// Date object
 	$date = new DateTime($d->date);
+	// Fill entity with title if none
+	$title = $d->title;
+	$entity = ucwords(str_replace('_',' ',$d->entity));
+	if(strlen($entity)<1){
+		$title = '';
+		$entity = $d->title;
+	}
 	// Prepare each of the items
 	$elements['items'][$i]['id'] = $d->id;
-	$elements['items'][$i]['entity'] = ucwords(str_replace('_',' ',$d->entity));
+	$elements['items'][$i]['entity'] = $entity;
 	$elements['items'][$i]['type'] = $types[$d->type];
-	$elements['items'][$i]['title'] = $d->title;
+	$elements['items'][$i]['title'] = $title;
 	// Return the date
 	$elements['items'][$i]['date']['y'] = $date->format('Y');
 	$elements['items'][$i]['date']['m'] = $date->format('m');

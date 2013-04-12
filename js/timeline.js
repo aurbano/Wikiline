@@ -14,7 +14,7 @@ var Timeline = {
 	/**
 	 * Minimum offset between drawn events
 	 */
-	combine : 30,
+	combine : 140,
 	/**
 	 * Events buffer 
 	 */
@@ -55,7 +55,8 @@ var Timeline = {
 	 * @param Object An object with all event properties
 	 */
 	drawEvent : function(evt){
-		// Sample event
+		console.log('Drawing event:');
+		console.log(evt);
 		// Test boundaries
 		if(evt.date.y < Timeline.interval.start || evt.date.y > Timeline.interval.end){
 			console.log('Event '+evt.title+' out of bounds');
@@ -74,6 +75,7 @@ var Timeline = {
 		if(Timeline.lastEvent.obj !== null){
 			// Now check offset
 			if(offset - Timeline.lastEvent.offset < Timeline.combine){
+				console.log('Combining with last, offset = '+Timeline.lastEvent.offset);
 				// Combine events
 				Timeline.lastEvent.obj.append(Timeline.createEvent(evt));
 				return;
@@ -84,7 +86,7 @@ var Timeline = {
 		var orientation = 'up';
 		if(orientation == Timeline.lastEvent.orientation) orientation = 'down';
 		
-		var height = 100 + Math.random()*400,
+		var height = 300 + Math.random()*100,
 			side = 'bottom:-';
 		if(orientation == 'up') side = 'top:-';
 		
