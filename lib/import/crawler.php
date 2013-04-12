@@ -1,12 +1,12 @@
 <?php
 /**
-   * WikipediaAPI
-   * 
+   * Wikipedia Crawlser - Parses articles getting links to other articles
+   * storing them in the database for later. 
    * 
    * @package    Wikiline
    */
-include('lib/session.php');			// Session management
-include('lib/wikipedia.api.php');	// Load Wikipedia php API
+include('../session.php');			// Session management
+include('../wikipedia.api.php');	// Load Wikipedia php API
 
 class Crawler{
 	/** Wikipedia API handle

@@ -1,12 +1,12 @@
 <?php
 /**
-   * WikipediaAPI
-   * 
+   * Wikipedia Parser - It scrapes articles looking for dates
+   * and then stores them in the Database.
    * 
    * @package    Wikiline
    */
-include('lib/session.php');			// Session management
-include('lib/wikipedia.api.php');	// Load Wikipedia php API
+include('../session.php');			// Session management
+include('../wikipedia.api.php');	// Load Wikipedia php API
 
 class Parser{
 	private $wiki;

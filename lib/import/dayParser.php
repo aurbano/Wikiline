@@ -1,12 +1,12 @@
 <?php
 /**
-   * WikipediaAPI
+   * Wikipedia Parser - Scrapes day articles for dates and events
    * 
    * 
    * @package    Wikiline
    */
-include('lib/session.php');			// Session management
-include('lib/wikipedia.api.php');	// Load Wikipedia php API
+include('../session.php');			// Session management
+include('../wikipedia.api.php');	// Load Wikipedia php API
 
 class DayParser{
 	// Wikipedia API
