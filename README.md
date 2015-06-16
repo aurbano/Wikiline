@@ -12,3 +12,5 @@ On the release server everything will run automatically from cron jobs, but on d
 All new work should be done on a new branch, once it works fine we send in a pull request. For automatic merges just go on, if the merge cannot be resolved automatically go in shell mode to fix the merge manually.
 
 All code in the master branch should be fully functional.
+
+[![Analytics](https://ga-beacon.appspot.com/UA-3181088-16/wikiline/readme)](https://github.com/aurbano)
